@@ -3,3 +3,13 @@
 /out
 .DS_Store
 *.local
+
+# Vim swap files
+*.swp
+*.swo
+*~
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-*
