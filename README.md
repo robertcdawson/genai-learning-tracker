@@ -1,6 +1,6 @@
 # Learning Tracker - GenAI Fundamentals (Next.js • Supabase • Vercel‑ready)
 
-A learning management app designed to help you track and manage your journey through generative AI fundamentals. Built with Next.js and Supabase for real-time sync across devices, with authentication and secure data storage.
+A learning management app designed to help you track and manage your genAI learning journey. Built with Next.js and Supabase for real-time sync across devices, with authentication and secure data storage.
 
 ## What's included
 - **Full-stack app**: Next.js frontend with Supabase backend
