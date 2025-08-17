@@ -1,0 +1,1 @@
+"use client";export default function LessonTable({items}){return(<div className="card"><table><thead><tr><th>Title</th><th>Status</th></tr></thead><tbody>{items.map(i=>(<tr key={i.id}><td>{i.title}</td><td>{i.status}</td></tr>))}</tbody></table></div>)}

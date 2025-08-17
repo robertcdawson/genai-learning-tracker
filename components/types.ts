@@ -1,0 +1,1 @@
+export type Status="Todo"|"Doing"|"Done"|"Blocked";export type Priority=1|2|3|4|5;export interface Lesson{ id:string; title:string; course?:string; status:Status; priority:Priority; tags:string[]; notes?:string; estimateMins?:number; actualMins?:number; unlockAt?:string; lastReviewedAt?:string; reviewLevel?:number; nextReviewAt?:string; createdAt:string; updatedAt:string;}

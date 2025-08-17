@@ -1,0 +1,1 @@
+"use client";export default function KPIs({items}){const total=items.length,done=items.filter(i=>i.status==="Done").length;const pct=total?Math.round((done/total)*100):0;return(<div className="card"><div>Items: {total} | Done: {done} | Progress: {pct}%</div></div>)}

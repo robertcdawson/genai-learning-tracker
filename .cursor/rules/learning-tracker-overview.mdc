@@ -1,0 +1,44 @@
+# Learning Tracker App Overview
+
+## Project Description
+A Next.js-based learning management application that helps users track and manage their learning lessons. It's a simple, single-page application with a modern dark theme UI.
+
+## Core Features
+- **Lesson Management**: Add new lessons with titles (auto-assigned defaults: status "Todo", priority 3, review level 0)
+- **Progress Tracking**: KPI display showing total lessons, completed lessons, and progress percentage
+- **Lesson Organization**: Table view displaying lesson titles and statuses
+- **Data Persistence**: Browser localStorage for data persistence between sessions
+
+## Technical Stack
+- **Framework**: Next.js 14.2.5 with React 18
+- **Language**: TypeScript
+- **Styling**: Custom CSS with dark theme
+- **Data Storage**: Browser localStorage via custom `useLocalStorage` hook
+
+## Data Structure
+Each lesson includes comprehensive metadata:
+- Basic info: id, title, course, status, priority
+- Organization: tags, notes
+- Time tracking: estimated minutes, actual minutes
+- Review system: review level, last reviewed date, next review date
+- Timestamps: created/updated dates
+
+## Current State
+MVP with basic functionality implemented. Data structure supports advanced features like spaced repetition, but UI only shows basic lesson management.
+
+## Key Files
+- `app/page.tsx`: Main application page
+- `components/LessonForm.tsx`: Form for adding new lessons
+- `components/KPIs.tsx`: Progress indicators display
+- `components/LessonTable.tsx`: Table view of lessons
+- `components/types.ts`: TypeScript type definitions
+- `components/useLocalStorage.ts`: Custom hook for localStorage persistence
+
+## Development Notes
+- Code appears minified/compressed (single-line format)
+- Built for production deployment
+- Supports advanced features in data model but basic UI implementation
+description:
+globs:
+alwaysApply: false
+---
