@@ -32,9 +32,10 @@ interface LessonTableProps {
   onUpdate: (lesson: UiLesson) => Promise<void>;
   filter: Filter;
   showFuture: boolean;
+  sortBy?: "updated" | "priority" | "status" | "title";
 }
 
-export default function LessonTable({ items, onUpdate, filter, showFuture }: LessonTableProps) {
+export default function LessonTable({ items, onUpdate, filter, showFuture, sortBy = "updated" }: LessonTableProps) {
   const filteredItems = items.filter(item => {
     // Text search
     if (filter.q && !item.title.toLowerCase().includes(filter.q.toLowerCase()) && 
@@ -116,46 +117,58 @@ export default function LessonTable({ items, onUpdate, filter, showFuture }: Les
     });
   };
 
+  const sortedItems = [...filteredItems].sort((a,b) => {
+    switch (sortBy) {
+      case "priority": return (b.priority ?? 0) - (a.priority ?? 0);
+      case "status": return a.status.localeCompare(b.status);
+      case "title": return a.title.localeCompare(b.title);
+      case "updated": default:
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    }
+  });
+
   return (
     <div className="card">
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <table>
         <thead>
           <tr>
-            <th style={{ textAlign: "left", padding: "8px", borderBottom: "1px solid #374151" }}>Title</th>
-            <th style={{ textAlign: "left", padding: "8px", borderBottom: "1px solid #374151" }}>Course</th>
-            <th style={{ textAlign: "left", padding: "8px", borderBottom: "1px solid #374151" }}>Status</th>
-            <th style={{ textAlign: "left", padding: "8px", borderBottom: "1px solid #374151" }}>Priority</th>
-            <th style={{ textAlign: "left", padding: "8px", borderBottom: "1px solid #374151" }}>Tags</th>
-            <th style={{ textAlign: "left", padding: "8px", borderBottom: "1px solid #374151" }}>Actions</th>
+            <th>Title</th>
+            <th>Course</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Tags</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {filteredItems.map(item => (
+          {sortedItems.map(item => (
             <tr key={item.id}>
-              <td style={{ padding: "8px", borderBottom: "1px solid #374151" }}>
+              <td>
                 <div>
                   <strong>{item.title}</strong>
+                  <div className="hstack" style={{ gap: 6, marginTop: 6, flexWrap: "wrap" }}>
+                    {item.unlockAt && new Date(item.unlockAt) > new Date() && (
+                      <span className="tag">🔒 Locked until {new Date(item.unlockAt).toLocaleDateString()}</span>
+                    )}
+                    {item.nextReviewAt && new Date(item.nextReviewAt) <= new Date() && (
+                      <span className="tag">🕒 Due for review</span>
+                    )}
+                  </div>
                   {item.notes && (
-                    <div style={{ fontSize: "0.875rem", color: "#9CA3AF", marginTop: "4px" }}>
+                    <div className="muted" style={{ fontSize: ".875rem", marginTop: 4 }}>
                       {item.notes}
                     </div>
                   )}
                 </div>
               </td>
-              <td style={{ padding: "8px", borderBottom: "1px solid #374151" }}>
+              <td>
                 {item.course || "-"}
               </td>
-              <td style={{ padding: "8px", borderBottom: "1px solid #374151" }}>
+              <td>
                 <select 
                   value={item.status} 
                   onChange={(e) => handleStatusChange(item.id, e.target.value as Status)}
-                  style={{ 
-                    padding: "4px 8px", 
-                    borderRadius: "4px", 
-                    border: "1px solid #374151",
-                    backgroundColor: "#1F2937",
-                    color: "#E5E7EB"
-                  }}
+                  
                 >
                   <option value="Todo">Todo</option>
                   <option value="Doing">Doing</option>
@@ -163,17 +176,11 @@ export default function LessonTable({ items, onUpdate, filter, showFuture }: Les
                   <option value="Blocked">Blocked</option>
                 </select>
               </td>
-              <td style={{ padding: "8px", borderBottom: "1px solid #374151" }}>
+              <td>
                 <select 
                   value={item.priority} 
                   onChange={(e) => handlePriorityChange(item.id, parseInt(e.target.value) as 1|2|3|4|5)}
-                  style={{ 
-                    padding: "4px 8px", 
-                    borderRadius: "4px", 
-                    border: "1px solid #374151",
-                    backgroundColor: "#1F2937",
-                    color: "#E5E7EB"
-                  }}
+                  
                 >
                   <option value={1}>1</option>
                   <option value={2}>2</option>
@@ -182,51 +189,21 @@ export default function LessonTable({ items, onUpdate, filter, showFuture }: Les
                   <option value={5}>5</option>
                 </select>
               </td>
-              <td style={{ padding: "8px", borderBottom: "1px solid #374151" }}>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+              <td>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                   {item.tags.map(tag => (
-                    <span 
-                      key={tag} 
-                      style={{ 
-                        padding: "2px 6px", 
-                        backgroundColor: "#374151", 
-                        borderRadius: "12px", 
-                        fontSize: "0.75rem" 
-                      }}
-                    >
+                    <span key={tag} className="tag">
                       {tag}
                     </span>
                   ))}
                 </div>
               </td>
-              <td style={{ padding: "8px", borderBottom: "1px solid #374151" }}>
-                <div style={{ display: "flex", gap: "4px" }}>
-                  <button 
-                    onClick={() => handleMarkReviewed(item.id)}
-                    style={{ 
-                      padding: "4px 8px", 
-                      fontSize: "0.75rem",
-                      backgroundColor: "#059669",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer"
-                    }}
-                  >
+              <td>
+                <div className="hstack" style={{ gap: 6 }}>
+                  <button onClick={() => handleMarkReviewed(item.id)} className="btn btn-success" style={{ padding: "6px 10px", fontSize: ".8rem" }}>
                     Review
                   </button>
-                  <button 
-                    onClick={() => handleDelete(item.id)}
-                    style={{ 
-                      padding: "4px 8px", 
-                      fontSize: "0.75rem",
-                      backgroundColor: "#DC2626",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer"
-                    }}
-                  >
+                  <button onClick={() => handleDelete(item.id)} className="btn btn-danger" style={{ padding: "6px 10px", fontSize: ".8rem" }}>
                     Delete
                   </button>
                 </div>
@@ -235,10 +212,8 @@ export default function LessonTable({ items, onUpdate, filter, showFuture }: Les
           ))}
         </tbody>
       </table>
-      {filteredItems.length === 0 && (
-        <div style={{ textAlign: "center", padding: "20px", color: "#9CA3AF" }}>
-          No lessons found matching your filters.
-        </div>
+      {sortedItems.length === 0 && (
+        <div className="empty">No lessons found matching your filters.</div>
       )}
     </div>
   );

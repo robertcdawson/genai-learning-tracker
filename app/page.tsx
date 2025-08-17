@@ -200,13 +200,15 @@ export default function Page() {
         <KPIs items={items} />
 
         <section className="card vstack">
-          <h3 style={{ marginTop: 0 }}>Add lesson</h3>
+          <div className="section-heading">
+            <h3 style={{ marginTop: 0 }}>Add lesson</h3>
+          </div>
           <LessonForm onAdd={addItem} />
         </section>
 
         <section className="card vstack">
-          <div className="hstack" style={{ justifyContent: "space-between", flexWrap: "wrap" }}>
-            <div className="hstack" style={{ flexWrap: "wrap" }}>
+          <div className="section-heading" style={{ flexWrap: "wrap" }}>
+            <div className="filters">
               <input placeholder="Search…" value={filter.q} onChange={e=>setFilter({...filter, q: e.target.value})} />
               <select value={filter.status} onChange={e=>setFilter({...filter, status: e.target.value as any})}>
                 {["All","Todo","Doing","Done","Blocked"].map(s=> <option key={s} value={s}>{s}</option>)}
@@ -230,10 +232,10 @@ export default function Page() {
           
           {/* Import/Export buttons */}
           <div className="hstack" style={{ justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
-            <button onClick={exportToJSON} style={{ padding: "8px 16px", cursor: "pointer" }}>
+            <button onClick={exportToJSON} className="btn btn-outline">
               Export JSON
             </button>
-            <label style={{ padding: "8px 16px", cursor: "pointer", border: "1px solid #ccc", borderRadius: "4px" }}>
+            <label className="btn btn-outline" style={{ cursor: "pointer" }}>
               Import JSON
               <input
                 type="file"
@@ -245,7 +247,7 @@ export default function Page() {
           </div>
         </section>
 
-        <LessonTable items={items} onUpdate={updateItem} filter={filter} showFuture={showFuture} />
+        <LessonTable items={items} onUpdate={updateItem} filter={filter} showFuture={showFuture} sortBy="updated" />
       </div>
     </AuthGate>
   );

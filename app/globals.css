@@ -1,1 +1,56 @@
-body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#e5e7eb;background:#0b0f1a}.container{max-width:1100px;margin:0 auto;padding:24px}.card{background:rgba(17,24,39,.85);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:20px}
+/* Design tokens */
+:root{--bg:#0b0f1a;--panel:rgba(17,24,39,.9);--panelBorder:rgba(255,255,255,.06);--text:#e5e7eb;--muted:#9ca3af;--accent:#8b5cf6;--accent-2:#06b6d4;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--line:#374151;--chip:#1f2937;--chipBorder:#2b3648;--shadow:0 10px 30px rgba(0,0,0,.3)}
+
+/* Base */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);}
+a{color:var(--accent)}
+
+/* Layout */
+.container{max-width:1100px;margin:0 auto;padding:24px}
+.card{background:var(--panel);border:1px solid var(--panelBorder);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.vstack{display:flex;flex-direction:column;gap:12px}
+.hstack{display:flex;align-items:center;gap:12px}
+.spacer{flex:1}
+
+/* Typography */
+h1{font-size:2.2rem;letter-spacing:.2px}
+h3{font-size:1.25rem;color:var(--text);margin:8px 0}
+small,.muted{color:var(--muted)}
+
+/* Controls */
+input,select,textarea{appearance:none;background:#0f172a;color:var(--text);border:1px solid var(--chipBorder);border-radius:10px;padding:10px 12px;outline:none;transition:border-color .15s,box-shadow .15s}
+input::placeholder{color:#6b7280}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,.15)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid var(--chipBorder);background:#111827;color:var(--text);cursor:pointer;transition:transform .06s ease,filter .15s ease,border-color .15s}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent;color:white}
+.btn-success{background:var(--success);border-color:transparent;color:white}
+.btn-danger{background:var(--danger);border-color:transparent;color:white}
+.btn-outline{background:transparent}
+
+/* Table */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+thead th{position:sticky;top:0;background:rgba(17,24,39,.95);backdrop-filter:saturate(1.2) blur(6px);}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+
+/* Chips */
+.tag{display:inline-flex;align-items:center;padding:2px 8px;background:var(--chip);border:1px solid var(--chipBorder);border-radius:999px;font-size:.75rem}
+
+/* KPI */
+.kpi{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--panelBorder);border-radius:14px;padding:14px;min-width:0}
+.kpi-title{font-size:.85rem;color:var(--muted)}
+.kpi-value{font-size:1.4rem;font-weight:700}
+.progress{height:10px;background:#111827;border-radius:999px;border:1px solid var(--chipBorder);overflow:hidden}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));}
+
+/* Sections */
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Empty state */
+.empty{color:var(--muted);text-align:center;padding:20px}

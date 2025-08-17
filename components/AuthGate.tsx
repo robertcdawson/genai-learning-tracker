@@ -25,9 +25,11 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
   if (!userId) {
     return (
-      <div className="card" style={{ maxWidth: 420 }}>
-        <h3>Sign in to sync</h3>
+      <div className="card" style={{ maxWidth: 520 }}>
+        <h3 style={{ marginTop: 0 }}>Sign in to sync</h3>
+        <p className="muted" style={{ marginTop: -4 }}>Your data is stored securely per user with RLS.</p>
         <form
+          className="hstack"
           onSubmit={async (e) => {
             e.preventDefault();
             await supabase.auth.signInWithOtp({ email });
@@ -38,8 +40,10 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            aria-label="Email"
+            type="email"
           />
-          <button type="submit">Send magic link</button>
+          <button type="submit" className="btn btn-primary">Send magic link</button>
         </form>
       </div>
     );
