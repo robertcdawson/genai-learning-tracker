@@ -2,6 +2,8 @@
 
 A learning management app designed to help you track and manage your genAI learning journey. Built with Next.js and Supabase for real-time sync across devices, with authentication and secure data storage.
 
+**Live Demo**: [https://genai-learning-tracker.vercel.app/](https://genai-learning-tracker.vercel.app/)
+
 ## What's included
 - **Full-stack app**: Next.js frontend with Supabase backend
 - **Authentication**: Email magic link authentication via Supabase Auth
@@ -176,6 +178,12 @@ supabase-schema.sql
 - **Browser console**: look for runtime errors.
 - **Health check**: confirm `/api/health` returns `{ ok: true }`.
 - **Supabase connection**: Check environment variables and database schema setup.
+- **Magic link pointing to localhost**: If magic link emails point to `localhost:3000` instead of your production URL:
+  1. Go to your Supabase project dashboard
+  2. Navigate to **Authentication** → **URL Configuration**
+  3. Update **Site URL** to your production URL (e.g., `https://your-app.vercel.app`)
+  4. Add your production URL to **Redirect URLs** if not already present
+  5. Save the changes
 
 ## License
 MIT
