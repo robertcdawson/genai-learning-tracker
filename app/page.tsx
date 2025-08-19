@@ -146,11 +146,40 @@ export default function Page() {
     const text = await file.text();
     
     try {
-      const parsed = JSON.parse(text) as UiLesson[];
-      
+      let parsed = JSON.parse(text) as any;
+
+      // Support both raw array and object wrappers like { items: [...] }
+      const arr: any[] = Array.isArray(parsed) ? parsed : (parsed?.items || parsed?.lessons || []);
+      if (!Array.isArray(arr) || arr.length === 0) {
+        alert("Import failed: no lessons found in the selected file.");
+        return;
+      }
+
+      // Normalize shape: tolerate different key names and provide defaults
+      const normalized: UiLesson[] = arr.map((x, i) => {
+        const nowIso = new Date().toISOString();
+        return {
+          id: x.id || crypto.randomUUID(),
+          title: String(x.title ?? x.name ?? `Imported ${i+1}`),
+          course: x.course ?? x.courseName ?? undefined,
+          status: (x.status ?? "Todo") as Status,
+          priority: (Number(x.priority ?? 3) as 1|2|3|4|5),
+          tags: Array.isArray(x.tags) ? x.tags : String(x.tags ?? "").split(",").map((t:string)=>t.trim()).filter(Boolean),
+          notes: x.notes ?? undefined,
+          estimateMins: x.estimateMins ?? x.estimate_mins ?? undefined,
+          actualMins: x.actualMins ?? x.actual_mins ?? undefined,
+          unlockAt: x.unlockAt ?? x.unlock_at ?? undefined,
+          lastReviewedAt: x.lastReviewedAt ?? x.last_reviewed_at ?? undefined,
+          reviewLevel: x.reviewLevel ?? x.review_level ?? 0,
+          nextReviewAt: x.nextReviewAt ?? x.next_review_at ?? undefined,
+          createdAt: x.createdAt ?? x.created_at ?? nowIso,
+          updatedAt: x.updatedAt ?? x.updated_at ?? nowIso,
+        };
+      });
+
       // Map UI lessons to DB format and bulk insert
-      const dbLessons = parsed.map(lesson => mapUiToDb(userId, lesson));
-      
+      const dbLessons = normalized.map(lesson => mapUiToDb(userId, lesson));
+
       const { data, error } = await supabase
         .from("lessons")
         .insert(dbLessons)
@@ -158,6 +187,7 @@ export default function Page() {
       
       if (error) { 
         console.error('Import error:', error); 
+        alert(`Import failed: ${error.message}`);
         return; 
       }
       
@@ -169,16 +199,19 @@ export default function Page() {
       
       if (refreshError) { 
         console.error(refreshError); 
+        alert(`Imported ${data?.length ?? 0} item(s), but refresh failed: ${refreshError.message}`);
         return; 
       }
       
       setItems((refreshedData ?? []).map(mapDbToUi));
+      alert(`Imported ${data?.length ?? 0} lesson(s).`);
       
       // Reset the file input
       event.target.value = '';
       
     } catch (error) {
       console.error('JSON parsing error:', error);
+      alert('Import failed: invalid JSON.');
     }
   }
 

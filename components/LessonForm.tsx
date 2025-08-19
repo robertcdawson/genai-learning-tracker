@@ -67,13 +67,16 @@ export default function LessonForm({ onAdd }: LessonFormProps) {
         onChange={e => setCourse(e.target.value)}
         aria-label="Course"
       />
-      <select aria-label="Priority" value={priority} onChange={e=>setPriority(parseInt(e.target.value) as 1|2|3|4|5)}>
-        <option value={1}>1</option>
-        <option value={2}>2</option>
-        <option value={3}>3</option>
-        <option value={4}>4</option>
-        <option value={5}>5</option>
-      </select>
+      <label className="hstack" style={{ gap: 8 }}>
+        <small className="muted" style={{ minWidth: 52 }}>Priority</small>
+        <select aria-label="Priority" value={priority} onChange={e=>setPriority(parseInt(e.target.value) as 1|2|3|4|5)}>
+          <option value={1}>1</option>
+          <option value={2}>2</option>
+          <option value={3}>3</option>
+          <option value={4}>4</option>
+          <option value={5}>5</option>
+        </select>
+      </label>
       <input
         placeholder="tags (comma separated)"
         value={tags}
