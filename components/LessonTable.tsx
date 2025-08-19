@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Status } from "./types";
 
 type UiLesson = {
@@ -36,6 +37,11 @@ interface LessonTableProps {
 }
 
 export default function LessonTable({ items, onUpdate, filter, showFuture, sortBy = "updated" }: LessonTableProps) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editCourse, setEditCourse] = useState("");
+  const [editTags, setEditTags] = useState("");
+  const [editNotes, setEditNotes] = useState("");
   const filteredItems = items.filter(item => {
     // Text search
     if (filter.q && !item.title.toLowerCase().includes(filter.q.toLowerCase()) && 
@@ -145,7 +151,19 @@ export default function LessonTable({ items, onUpdate, filter, showFuture, sortB
             <tr key={item.id}>
               <td>
                 <div>
-                  <strong>{item.title}</strong>
+                  {editingId === item.id ? (
+                    <div className="vstack" style={{ gap: 6 }}>
+                      <input value={editTitle} onChange={e=>setEditTitle(e.target.value)} aria-label="Title" />
+                      <textarea value={editNotes} onChange={e=>setEditNotes(e.target.value)} aria-label="Notes" placeholder="Notes (optional)" />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="hstack" style={{ gap: 8, alignItems: "baseline" }}>
+                        <strong>{item.title}</strong>
+                        <span className="tag" title="Review level">RL {item.reviewLevel ?? 0}</span>
+                      </div>
+                    </>
+                  )}
                   <div className="hstack" style={{ gap: 6, marginTop: 6, flexWrap: "wrap" }}>
                     {item.unlockAt && new Date(item.unlockAt) > new Date() && (
                       <span className="tag">🔒 Locked until {new Date(item.unlockAt).toLocaleDateString()}</span>
@@ -154,7 +172,7 @@ export default function LessonTable({ items, onUpdate, filter, showFuture, sortB
                       <span className="tag">🕒 Due for review</span>
                     )}
                   </div>
-                  {item.notes && (
+                  {(!editingId || editingId !== item.id) && item.notes && (
                     <div className="muted" style={{ fontSize: ".875rem", marginTop: 4 }}>
                       {item.notes}
                     </div>
@@ -162,7 +180,11 @@ export default function LessonTable({ items, onUpdate, filter, showFuture, sortB
                 </div>
               </td>
               <td>
-                {item.course || "-"}
+                {editingId === item.id ? (
+                  <input value={editCourse} onChange={e=>setEditCourse(e.target.value)} aria-label="Course" placeholder="Course" />
+                ) : (
+                  item.course || "-"
+                )}
               </td>
               <td>
                 <select 
@@ -190,19 +212,47 @@ export default function LessonTable({ items, onUpdate, filter, showFuture, sortB
                 </select>
               </td>
               <td>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                  {item.tags.map(tag => (
-                    <span key={tag} className="tag">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                {editingId === item.id ? (
+                  <input value={editTags} onChange={e=>setEditTags(e.target.value)} aria-label="Tags" placeholder="tag1, tag2" />
+                ) : (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                    {item.tags.map(tag => (
+                      <span key={tag} className="tag">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </td>
               <td>
                 <div className="hstack" style={{ gap: 6 }}>
                   <button onClick={() => handleMarkReviewed(item.id)} className="btn btn-success" style={{ padding: "6px 10px", fontSize: ".8rem" }}>
                     Review
                   </button>
+                  {editingId === item.id ? (
+                    <>
+                      <button className="btn btn-primary" style={{ padding: "6px 10px", fontSize: ".8rem" }}
+                        onClick={async ()=>{
+                          const base = items.find(i=>i.id===item.id);
+                          if(!base) return;
+                          const updated: UiLesson = {
+                            ...base,
+                            title: editTitle || base.title,
+                            course: editCourse || undefined,
+                            notes: editNotes || undefined,
+                            tags: editTags.split(',').map(t=>t.trim()).filter(Boolean)
+                          };
+                          await onUpdate(updated);
+                          setEditingId(null);
+                        }}
+                      >Save</button>
+                      <button className="btn" style={{ padding: "6px 10px", fontSize: ".8rem" }} onClick={()=>setEditingId(null)}>Cancel</button>
+                    </>
+                  ) : (
+                    <button className="btn" style={{ padding: "6px 10px", fontSize: ".8rem" }}
+                      onClick={()=>{ setEditingId(item.id); setEditTitle(item.title); setEditCourse(item.course ?? ""); setEditNotes(item.notes ?? ""); setEditTags(item.tags.join(", ")); }}
+                    >Edit</button>
+                  )}
                   <button onClick={() => handleDelete(item.id)} className="btn btn-danger" style={{ padding: "6px 10px", fontSize: ".8rem" }}>
                     Delete
                   </button>

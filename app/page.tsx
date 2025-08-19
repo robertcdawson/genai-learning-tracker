@@ -108,13 +108,26 @@ export default function Page() {
 
   async function updateItem(next: UiLesson) {
     if ((next as any)._delete) return deleteItem(next.id);
+    // Optimistic update
+    let prevItem: UiLesson | undefined;
+    setItems(prev => {
+      prevItem = prev.find(i => i.id === next.id);
+      return prev.map(i => i.id === next.id ? { ...i, ...next } : i);
+    });
+
     const { data, error } = await supabase
       .from("lessons")
       .update(mapUiToDb(userId!, next))
       .eq("id", next.id)
       .select()
       .single();
-    if (error) { console.error(error); return; }
+    if (error) {
+      console.error(error);
+      // Revert optimistic update
+      if (prevItem) setItems(prev => prev.map(i => i.id === next.id ? prevItem! : i));
+      alert(`Update failed: ${error.message}`);
+      return;
+    }
     setItems(prev => prev.map(i => i.id === next.id ? mapDbToUi(data as DbLesson) : i));
   }
 
