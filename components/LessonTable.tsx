@@ -114,7 +114,7 @@ export default function LessonTable({ items, onUpdate, filter, showFuture, sortB
     const intervals = [1, 2, 4, 7, 14, 30, 60];
     const nextReviewDays = intervals[Math.min(reviewLevel - 1, intervals.length - 1)];
     const nextReviewAt = new Date(now.getTime() + nextReviewDays * 24 * 60 * 60 * 1000);
-    
+    // Optimistic UI update for snappy feedback
     await onUpdate({
       ...item,
       lastReviewedAt: now.toISOString(),
@@ -226,12 +226,12 @@ export default function LessonTable({ items, onUpdate, filter, showFuture, sortB
               </td>
               <td>
                 <div className="hstack" style={{ gap: 6 }}>
-                  <button onClick={() => handleMarkReviewed(item.id)} className="btn btn-success" style={{ padding: "6px 10px", fontSize: ".8rem" }}>
+                  <button type="button" onClick={() => handleMarkReviewed(item.id)} className="btn btn-success" style={{ padding: "6px 10px", fontSize: ".8rem" }}>
                     Review
                   </button>
                   {editingId === item.id ? (
                     <>
-                      <button className="btn btn-primary" style={{ padding: "6px 10px", fontSize: ".8rem" }}
+                      <button type="button" className="btn btn-primary" style={{ padding: "6px 10px", fontSize: ".8rem" }}
                         onClick={async ()=>{
                           const base = items.find(i=>i.id===item.id);
                           if(!base) return;
@@ -246,14 +246,14 @@ export default function LessonTable({ items, onUpdate, filter, showFuture, sortB
                           setEditingId(null);
                         }}
                       >Save</button>
-                      <button className="btn" style={{ padding: "6px 10px", fontSize: ".8rem" }} onClick={()=>setEditingId(null)}>Cancel</button>
+                      <button type="button" className="btn" style={{ padding: "6px 10px", fontSize: ".8rem" }} onClick={()=>setEditingId(null)}>Cancel</button>
                     </>
                   ) : (
-                    <button className="btn" style={{ padding: "6px 10px", fontSize: ".8rem" }}
+                    <button type="button" className="btn" style={{ padding: "6px 10px", fontSize: ".8rem" }}
                       onClick={()=>{ setEditingId(item.id); setEditTitle(item.title); setEditCourse(item.course ?? ""); setEditNotes(item.notes ?? ""); setEditTags(item.tags.join(", ")); }}
                     >Edit</button>
                   )}
-                  <button onClick={() => handleDelete(item.id)} className="btn btn-danger" style={{ padding: "6px 10px", fontSize: ".8rem" }}>
+                  <button type="button" onClick={() => handleDelete(item.id)} className="btn btn-danger" style={{ padding: "6px 10px", fontSize: ".8rem" }}>
                     Delete
                   </button>
                 </div>
