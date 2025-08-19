@@ -156,14 +156,28 @@ export default function Page() {
       }
 
       // Normalize shape: tolerate different key names and provide defaults
+      const normalizeStatus = (s: any): Status => {
+        const v = String(s ?? "Todo").toLowerCase().trim();
+        if (["todo","to do","backlog"].includes(v)) return "Todo";
+        if (["doing","in-progress","in progress","wip","progress"].includes(v)) return "Doing";
+        if (["done","complete","completed","finished"].includes(v)) return "Done";
+        if (["blocked","hold","on hold","paused"].includes(v)) return "Blocked";
+        return "Todo";
+      };
+
+      const clampPriority = (p: any): 1|2|3|4|5 => {
+        const n = Math.round(Number(p ?? 3));
+        return Math.min(5, Math.max(1, n)) as 1|2|3|4|5;
+      };
+
       const normalized: UiLesson[] = arr.map((x, i) => {
         const nowIso = new Date().toISOString();
         return {
           id: x.id || crypto.randomUUID(),
           title: String(x.title ?? x.name ?? `Imported ${i+1}`),
           course: x.course ?? x.courseName ?? undefined,
-          status: (x.status ?? "Todo") as Status,
-          priority: (Number(x.priority ?? 3) as 1|2|3|4|5),
+          status: normalizeStatus(x.status),
+          priority: clampPriority(x.priority),
           tags: Array.isArray(x.tags) ? x.tags : String(x.tags ?? "").split(",").map((t:string)=>t.trim()).filter(Boolean),
           notes: x.notes ?? undefined,
           estimateMins: x.estimateMins ?? x.estimate_mins ?? undefined,
