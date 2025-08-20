@@ -14,9 +14,6 @@ type UiLesson = {
   estimateMins?: number; 
   actualMins?: number;
   unlockAt?: string; 
-  lastReviewedAt?: string; 
-  reviewLevel?: number; 
-  nextReviewAt?: string;
   createdAt: string; 
   updatedAt: string;
 };
@@ -25,7 +22,6 @@ type Filter = {
   q: string;
   status: "All" | Status;
   tag: string;
-  overdueOnly: boolean;
 };
 
 interface LessonTableProps {
@@ -57,13 +53,6 @@ export default function LessonTable({ items, onUpdate, filter, showFuture, sortB
     // Tag filter
     if (filter.tag && !item.tags.includes(filter.tag)) {
       return false;
-    }
-    
-    // Overdue review filter
-    if (filter.overdueOnly) {
-      if (!item.nextReviewAt) return false;
-      const nextReview = new Date(item.nextReviewAt);
-      if (nextReview > new Date()) return false;
     }
     
     // Future lessons filter
@@ -105,24 +94,6 @@ export default function LessonTable({ items, onUpdate, filter, showFuture, sortB
     } as any);
   };
 
-  const handleMarkReviewed = async (id: string) => {
-    const item = items.find(i => i.id === id);
-    if (!item) return;
-    
-    const now = new Date();
-    const reviewLevel = (item.reviewLevel || 0) + 1;
-    const intervals = [1, 2, 4, 7, 14, 30, 60];
-    const nextReviewDays = intervals[Math.min(reviewLevel - 1, intervals.length - 1)];
-    const nextReviewAt = new Date(now.getTime() + nextReviewDays * 24 * 60 * 60 * 1000);
-    // Optimistic UI update for snappy feedback
-    await onUpdate({
-      ...item,
-      lastReviewedAt: now.toISOString(),
-      reviewLevel,
-      nextReviewAt: nextReviewAt.toISOString()
-    });
-  };
-
   const sortedItems = [...filteredItems].sort((a,b) => {
     switch (sortBy) {
       case "priority": return (b.priority ?? 0) - (a.priority ?? 0);
@@ -160,16 +131,12 @@ export default function LessonTable({ items, onUpdate, filter, showFuture, sortB
                     <>
                       <div className="hstack" style={{ gap: 8, alignItems: "baseline" }}>
                         <strong>{item.title}</strong>
-                        <span className="tag" title="Review level">RL {item.reviewLevel ?? 0}</span>
                       </div>
                     </>
                   )}
                   <div className="hstack" style={{ gap: 6, marginTop: 6, flexWrap: "wrap" }}>
                     {item.unlockAt && new Date(item.unlockAt) > new Date() && (
                       <span className="tag">🔒 Locked until {new Date(item.unlockAt).toLocaleDateString()}</span>
-                    )}
-                    {item.nextReviewAt && new Date(item.nextReviewAt) <= new Date() && (
-                      <span className="tag">🕒 Due for review</span>
                     )}
                   </div>
                   {(!editingId || editingId !== item.id) && item.notes && (
@@ -226,9 +193,6 @@ export default function LessonTable({ items, onUpdate, filter, showFuture, sortB
               </td>
               <td>
                 <div className="hstack" style={{ gap: 6 }}>
-                  <button type="button" onClick={() => handleMarkReviewed(item.id)} className="btn btn-success" style={{ padding: "6px 10px", fontSize: ".8rem" }}>
-                    Review
-                  </button>
                   {editingId === item.id ? (
                     <>
                       <button type="button" className="btn btn-primary" style={{ padding: "6px 10px", fontSize: ".8rem" }}
