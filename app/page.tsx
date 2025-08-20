@@ -263,7 +263,7 @@ export default function Page() {
           <div className="section-heading">
             <h3 style={{ marginTop: 0 }}>Add lesson</h3>
           </div>
-          <LessonForm onAdd={addItem} />
+          <LessonForm onAdd={addItem} suggestedTags={tags} />
         </section>
 
         <section className="card vstack">
