@@ -12,10 +12,7 @@ type UiLesson = {
   notes?: string; 
   estimateMins?: number; 
   actualMins?: number;
-  unlockAt?: string; 
-  lastReviewedAt?: string; 
-  reviewLevel?: number; 
-  nextReviewAt?: string;
+  unlockAt?: string;
   createdAt: string; 
   updatedAt: string;
 };

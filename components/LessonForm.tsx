@@ -13,10 +13,7 @@ type UiLesson = {
   notes?: string; 
   estimateMins?: number; 
   actualMins?: number;
-  unlockAt?: string; 
-  lastReviewedAt?: string; 
-  reviewLevel?: number; 
-  nextReviewAt?: string;
+  unlockAt?: string;
   createdAt: string; 
   updatedAt: string;
 };
@@ -45,8 +42,7 @@ export default function LessonForm({ onAdd, suggestedTags = [] }: LessonFormProp
       priority,
       tags: tags.split(",").map(t=>t.trim()).filter(Boolean),
       createdAt: now,
-      updatedAt: now,
-      reviewLevel: 0
+      updatedAt: now
     });
     setTitle("");
     setCourse("");

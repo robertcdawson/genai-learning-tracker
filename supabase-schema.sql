@@ -11,9 +11,6 @@ CREATE TABLE IF NOT EXISTS lessons (
   estimate_mins INTEGER,
   actual_mins INTEGER,
   unlock_at TIMESTAMP WITH TIME ZONE,
-  last_reviewed_at TIMESTAMP WITH TIME ZONE,
-  review_level INTEGER DEFAULT 0,
-  next_review_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

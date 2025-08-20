@@ -20,9 +20,6 @@ type DbLesson = {
   estimate_mins: number | null;
   actual_mins: number | null;
   unlock_at: string | null;
-  last_reviewed_at: string | null;
-  review_level: number | null;
-  next_review_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -30,7 +27,7 @@ type DbLesson = {
 type UiLesson = {
   id: string; course?: string; title: string; status: Status; priority: 1|2|3|4|5;
   tags: string[]; notes?: string; estimateMins?: number; actualMins?: number;
-  unlockAt?: string; lastReviewedAt?: string; reviewLevel?: number; nextReviewAt?: string;
+  unlockAt?: string;
   createdAt: string; updatedAt: string;
 };
 
@@ -48,9 +45,6 @@ function mapDbToUi(x: DbLesson): UiLesson {
     estimateMins: x.estimate_mins ?? undefined,
     actualMins: x.actual_mins ?? undefined,
     unlockAt: x.unlock_at ?? undefined,
-    lastReviewedAt: x.last_reviewed_at ?? undefined,
-    reviewLevel: x.review_level ?? 0,
-    nextReviewAt: x.next_review_at ?? undefined,
     createdAt: x.created_at,
     updatedAt: x.updated_at,
   };
@@ -68,16 +62,13 @@ function mapUiToDb(user_id: string, l: UiLesson): Partial<DbLesson> {
     estimate_mins: l.estimateMins ?? null,
     actual_mins: l.actualMins ?? null,
     unlock_at: l.unlockAt ?? null,
-    last_reviewed_at: l.lastReviewedAt ?? null,
-    review_level: l.reviewLevel ?? 0,
-    next_review_at: l.nextReviewAt ?? null,
   };
 }
 
 export default function Page() {
   const [items, setItems] = useState<UiLesson[]>([]);
   const [showFuture, setShowFuture] = useState(true);
-  const [filter, setFilter] = useState<{q:string; status: "All"|Status; tag:string; overdueOnly:boolean}>({ q:"", status:"All", tag:"", overdueOnly:false });
+  const [filter, setFilter] = useState<{q:string; status: "All"|Status; tag:string}>({ q:"", status:"All", tag:""});
   const [userId, setUserId] = useState<string | null>(null);
 
   // Get current user
@@ -196,9 +187,6 @@ export default function Page() {
           estimateMins: x.estimateMins ?? x.estimate_mins ?? undefined,
           actualMins: x.actualMins ?? x.actual_mins ?? undefined,
           unlockAt: x.unlockAt ?? x.unlock_at ?? undefined,
-          lastReviewedAt: x.lastReviewedAt ?? x.last_reviewed_at ?? undefined,
-          reviewLevel: x.reviewLevel ?? x.review_level ?? 0,
-          nextReviewAt: x.nextReviewAt ?? x.next_review_at ?? undefined,
           createdAt: x.createdAt ?? x.created_at ?? nowIso,
           updatedAt: x.updatedAt ?? x.updated_at ?? nowIso,
         };
@@ -277,10 +265,6 @@ export default function Page() {
                 <option value="">All tags</option>
                 {tags.map(t=> <option key={t} value={t}>{t}</option>)}
               </select>
-              <label className="hstack" style={{ gap: 8 }}>
-                <input type="checkbox" checked={filter.overdueOnly} onChange={e=>setFilter({...filter, overdueOnly: e.target.checked})} />
-                <small>Due for review</small>
-              </label>
             </div>
             <div className="hstack">
               <label className="hstack" style={{ gap: 8 }}>
